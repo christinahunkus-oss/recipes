@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Recipe Keeper</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f9f5eb; }
+  h1 { color: #d35400; }
+  button { background: #e67e22; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+  .recipe-card { background: white; padding: 15px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+  .modal-content { background: white; margin: 5% auto; padding: 20px; width: 70%; border-radius: 8px; max-height: 80vh; overflow-y: auto; }
+</style>
+</head>
+<body>
+<h1>🍳 My Recipe Keeper</h1>
+<button onclick="showAddForm()">Add New Recipe</button>
+
+<div id="recipes"></div>
+
+<!-- Add/Edit Modal -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle">Add Recipe</h2>
+    <input type="text" id="title" placeholder="Recipe Title" style="width:100%;padding:10px;margin:10px 0;"><br>
+    <textarea id="ingredients" placeholder="Ingredients (one per line)" style="width:100%;height:120px;padding:10px;margin:10px 0;"></textarea>
+    <textarea id="instructions" placeholder="Instructions" style="width:100%;height:120px;padding:10px;margin:10px 0;"></textarea>
+    <input type="text" id="time" placeholder="Time (e.g. 30 mins)">
+    <button onclick="saveRecipe()">Save Recipe</button>
+    <button onclick="closeModal()" style="background:#95a5a6;">Cancel</button>
+  </div>
+</div>
+
+<script>
+let recipes = [
+  {
+    id: 1,
+    title: "Lemon Garlic Chicken",
+    ingredients: "4 chicken breasts\n4 garlic cloves\n2 lemons\nOlive oil\nSalt & pepper",
+    instructions: "Season chicken with salt and pepper. Brown in olive oil. Add sliced garlic and lemon slices. Bake at 400°F for 25 minutes.",
+    time: "35 mins"
+  },
+  {
+    id: 2,
+    title: "Creamy Mushroom Pasta",
+    ingredients: "12 oz pasta\n1 lb mushrooms\n3 garlic cloves\n1 cup cream\nParmesan cheese",
+    instructions: "Cook pasta. Sauté mushrooms and garlic. Add cream and simmer. Toss with pasta and top with parmesan.",
+    time: "25 mins"
+  }
+];
+
+function renderRecipes() {
+  const container = document.getElementById('recipes');
+  container.innerHTML = '';
+  
+  recipes.forEach(recipe => {
+    const div = document.createElement('div');
+    div.className = 'recipe-card';
+    div.innerHTML = `
+      <h3>${recipe.title}</h3>
+      <p><strong>Time:</strong> ${recipe.time}</p>
+      <button onclick="viewRecipe(${recipe.id})">View Recipe</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function showAddForm() {
+  document.getElementById('modalTitle').textContent = 'Add Recipe';
+  document.getElementById('title').value = '';
+  document.getElementById('ingredients').value = '';
+  document.getElementById('instructions').value = '';
+  document.getElementById('time').value = '';
+  document.getElementById('modal').style.display = 'block';
+}
+
+function closeModal() {
+  document.getElementById('modal').style.display = 'none';
+}
+
+function saveRecipe() {
+  const title = document.getElementById('title').value;
+  if (!title) return alert("Please add a title");
+
+  const ingredients = document.getElementById('ingredients').value;
+  const instructions = document.getElementById('instructions').value;
+  const time = document.getElementById('time').value;
+
+  recipes.push({
+    id: Date.now(),
+    title,
+    ingredients,
+    instructions,
+    time
+  });
+
+  closeModal();
+  renderRecipes();
+}
+
+function viewRecipe(id) {
+  const recipe = recipes.find(r => r.id === id);
+  if (!recipe) return;
+  
+  const ingredientsList = recipe.ingredients.split('\n').map(line => `<li>${line}</li>`).join('');
+  
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.innerHTML = `
+    <h2>${recipe.title}</h2>
+    <p><strong>Time:</strong> ${recipe.time}</p>
+    <h3>Ingredients</h3>
+    <ul>${ingredientsList}</ul>
+    <h3>Instructions</h3>
+    <p>${recipe.instructions}</p>
+    <button onclick="closeModal()" style="background:#95a5a6;">Close</button>
+  `;
+  document.getElementById('modal').style.display = 'block';
+}
+
+renderRecipes();
+</script>
+</body>
+</html>
